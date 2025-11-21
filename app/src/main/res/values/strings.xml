@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MedicalSum</string>
+    <string name="back_button_arrow">&lt;</string>
+    <string name="option_1">Extract (10–15 rows)</string>
+    <string name="option_2">Short (5–8 rows)</string>
+    <string name="option_3">TL/DR (2–3 rows)</string>
+</resources>
