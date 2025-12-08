@@ -59,18 +59,14 @@ class MainActivity : ComponentActivity() {
     private fun summarizeText(text: String) {
 
         val url = "http://10.0.2.2:8000/summarize"
-
-        val json = """
-            {
-                "text": "$text"
-            }
-        """
-
-        val requestBody = json.toRequestBody("application/json".toMediaType())
+        val requestBody = text.toRequestBody(
+            "text/plain".toMediaType()
+        )
 
         val request = Request.Builder()
             .url(url)
             .post(requestBody)
+            .addHeader("Content-Type", "text/plain")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -78,7 +74,11 @@ class MainActivity : ComponentActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, "Request failed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Request failed!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -88,7 +88,11 @@ class MainActivity : ComponentActivity() {
 
                 if (!response.isSuccessful || body == null) {
                     runOnUiThread {
-                        Toast.makeText(this@MainActivity, "Server error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Server error",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     return
                 }
