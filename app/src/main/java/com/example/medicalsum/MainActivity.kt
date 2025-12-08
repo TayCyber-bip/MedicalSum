@@ -1,40 +1,122 @@
 package com.example.medicalsum
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.medicalsum.ui.theme.MedicalSumTheme
+import androidx.lifecycle.lifecycleScope
+import com.example.medicalsum.data.AppDatabase
+import com.example.medicalsum.data.SummaryEntity
+import com.example.medicalsum.repository.SummaryRepository
+import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.IOException
+
 
 class MainActivity : ComponentActivity() {
+
+    private val client = OkHttpClient()
+    private lateinit var repository: SummaryRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val homeIcon = findViewById<ImageView>(R.id.home_icon)
-        val libraryIcon = findViewById<ImageView>(R.id.library_icon)
         val applyBtn = findViewById<Button>(R.id.btn_apply)
+        val inputText = findViewById<EditText>(R.id.input_text)
+        val libraryIcon = findViewById<ImageView>(R.id.library_icon)
 
-        homeIcon.setBackgroundResource(R.drawable.bg_circle_selected)
+        val db = AppDatabase.getDatabase(this)
+        repository = SummaryRepository(db.summaryDao())
 
-        libraryIcon.setOnClickListener {
-            val intent = Intent(this, SummaryActivity::class.java)
-            startActivity(intent)
-        }
         applyBtn.setOnClickListener {
-            val intent = Intent(this, SummaryDetailsActivity::class.java)
-            startActivity(intent)
+
+            val text = inputText.text.toString().trim()
+
+            if (text.isEmpty()) {
+                Toast.makeText(this, "Please enter some text!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            summarizeText(text)
         }
+        libraryIcon.setOnClickListener {
+            startActivity(Intent(this, SummaryActivity::class.java))
+        }
+    }
+
+    private fun summarizeText(text: String) {
+
+        val url = "http://10.0.2.2:8000/summarize"
+
+        val json = """
+            {
+                "text": "$text"
+            }
+        """
+
+        val requestBody = json.toRequestBody("application/json".toMediaType())
+
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(this@MainActivity, "Request failed!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+
+                val body = response.body?.string()
+
+                if (!response.isSuccessful || body == null) {
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "Server error", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+
+                val jsonObj = JSONObject(body)
+                val summary = jsonObj.getString("summary")
+
+                // SAVE DB
+                lifecycleScope.launch {
+
+                    repository.insert(
+                        SummaryEntity(
+                            title = "title",
+                            originalText = text,
+                            summaryText = summary
+                        )
+                    )
+
+                    // OPEN SUMMARY DETAIL PAGE
+                    val intent = Intent(
+                        this@MainActivity,
+                        SummaryDetailsActivity::class.java
+                    )
+                    intent.putExtra("summary_text", summary)
+                    startActivity(intent)
+                }
+            }
+        })
     }
 }
 

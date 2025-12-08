@@ -8,7 +8,6 @@
     android:background="#C8C4FF"
     tools:context=".MainActivity">
 
-    <!-- Thanh logo trên cùng -->
     <View
         android:id="@+id/rectangle_bg2"
         android:layout_width="0dp"
@@ -28,7 +27,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/rectangle_bg2"/>
 
-    <!-- Vùng chức năng chính -->
     <View
         android:id="@+id/rectangle_bg"
         android:layout_width="308dp"
@@ -69,7 +67,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Ô nhập văn bản -->
+    <!-- Text input -->
     <EditText
         android:id="@+id/input_text"
         android:layout_width="0dp"
@@ -84,7 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Biểu tượng copy -->
+    <!-- Copy icon -->
     <ImageView
         android:id="@+id/copy_icon"
         android:layout_width="47dp"
@@ -95,7 +93,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="145dp"/>
 
-    <!-- Thanh điều hướng dưới -->
+    <!-- Navigation bar -->
     <ImageView
         android:id="@+id/home_icon"
         android:layout_width="47dp"
