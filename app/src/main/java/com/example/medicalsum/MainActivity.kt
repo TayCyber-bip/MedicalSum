@@ -99,13 +99,14 @@ class MainActivity : ComponentActivity() {
 
                 val jsonObj = JSONObject(body)
                 val summary = jsonObj.getString("summary")
+                val defaultTitle = "Title"
 
                 // SAVE DB
                 lifecycleScope.launch {
 
                     repository.insert(
                         SummaryEntity(
-                            title = "title",
+                            title = defaultTitle,
                             originalText = text,
                             summaryText = summary
                         )
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity() {
                         SummaryDetailsActivity::class.java
                     )
                     intent.putExtra("summary_text", summary)
+                    intent.putExtra("summary_title", defaultTitle)
                     startActivity(intent)
                 }
             }
