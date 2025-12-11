@@ -1,5 +1,6 @@
 package com.example.medicalsum
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,5 +36,18 @@ class SummaryAdapter :
             val item = items[position]
             holder.title.text = item.title
             holder.summary.text = item.summaryText
+
+            //Click item
+            holder.itemView.setOnClickListener {
+
+                val intent = Intent(holder.itemView.context, SummaryDetailsActivity::class.java)
+
+                intent.putExtra("summary_id", item.id)
+                intent.putExtra("summary_title", item.title)
+                intent.putExtra("summary_text", item.summaryText)
+                //intent.putExtra("original_text", item.originalText)
+
+                holder.itemView.context.startActivity(intent)
+            }
         }
 }

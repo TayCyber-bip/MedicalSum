@@ -12,4 +12,9 @@ class SummaryRepository(private val dao: SummaryDao) {
     }
 
     suspend fun getAll() = dao.getAll()
+
+    suspend fun updateTitle(id: Int, newTitle: String) = dao.updateTitle(id, newTitle)
+    suspend fun deleteAll() {
+        dao.deleteAll()
+    }
 }

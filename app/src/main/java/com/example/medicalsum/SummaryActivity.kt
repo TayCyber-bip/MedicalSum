@@ -32,6 +32,18 @@ class SummaryActivity : ComponentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+        val deleteBtn = findViewById<ImageView>(R.id.delete_all_button)
+        loadSummaries()
+
+        deleteBtn.setOnClickListener {
+            lifecycleScope.launch {
+                repository.deleteAll()
+                loadSummaries()
+            }
+        }
+    }
+
+    private fun loadSummaries() {
         lifecycleScope.launch {
             val list = repository.getAll()
             adapter.submitList(list)

@@ -20,7 +20,7 @@
     <TextView
         android:id="@+id/app_name"
         android:layout_width="183dp"
-        android:layout_height="120dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="@string/app_name"
         android:textColor="#333333"
@@ -36,6 +36,7 @@
         android:id="@+id/ui_image_icon"
         android:layout_width="186dp"
         android:layout_height="126dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ui_image_1"
         app:layout_constraintTop_toTopOf="parent"

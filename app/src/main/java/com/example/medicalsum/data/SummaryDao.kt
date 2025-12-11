@@ -16,4 +16,10 @@ interface SummaryDao {
 
     @Query("SELECT * FROM summaries WHERE id = :id")
     suspend fun getById(id: Int): SummaryEntity
+
+    @Query("UPDATE summaries SET title = :newTitle WHERE id = :summaryId")
+    suspend fun updateTitle(summaryId: Int, newTitle: String)
+
+    @Query("DELETE FROM summaries")
+    suspend fun deleteAll()
 }
