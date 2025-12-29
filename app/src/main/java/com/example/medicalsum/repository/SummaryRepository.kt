@@ -1,7 +1,5 @@
 package com.example.medicalsum.repository
 
-import android.content.Context
-import com.example.medicalsum.data.AppDatabase
 import com.example.medicalsum.data.SummaryDao
 import com.example.medicalsum.data.SummaryEntity
 
@@ -17,4 +15,8 @@ class SummaryRepository(private val dao: SummaryDao) {
     suspend fun deleteAll() {
         dao.deleteAll()
     }
+
+    suspend fun getById(id: Int): SummaryEntity? = dao.getById(id)
+
+    suspend fun updateSummary(id: Int, newSummary: String) = dao.updateSummaryText(id, newSummary)
 }

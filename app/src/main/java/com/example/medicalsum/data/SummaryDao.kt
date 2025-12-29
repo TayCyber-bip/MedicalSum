@@ -22,4 +22,7 @@ interface SummaryDao {
 
     @Query("DELETE FROM summaries")
     suspend fun deleteAll()
+
+    @Query("UPDATE summaries SET summaryText = :newSummary WHERE id = :id")
+    suspend fun updateSummaryText(id: Int, newSummary: String)
 }

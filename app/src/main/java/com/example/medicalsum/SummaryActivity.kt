@@ -10,39 +10,61 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.medicalsum.data.AppDatabase
 import com.example.medicalsum.repository.SummaryRepository
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class SummaryActivity : ComponentActivity() {
     private lateinit var repository: SummaryRepository
+    private lateinit var btnDelete: ImageView
+    private lateinit var btnHome: ImageView
+    private lateinit var recyclerView: RecyclerView
     private val adapter = SummaryAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.summary)
+        repository = SummaryRepository(AppDatabase.getDatabase(this).summaryDao())
 
-        val homeIcon = findViewById<ImageView>(R.id.home_icon)
-        homeIcon.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
-        val db = AppDatabase.getDatabase(this)
-        repository = SummaryRepository(db.summaryDao())
-
-        val recyclerView = findViewById<RecyclerView>(R.id.rvSummaries)
+        initViews()
+        setupRecyclerView()
+        loadSummaries()
+        setupListeners()
+        setupBottomNavigation()
+    }
+    private fun initViews() {
+        btnDelete = findViewById<ImageView>(R.id.delete_all_button)
+        recyclerView = findViewById<RecyclerView>(R.id.rvSummaries)
+    }
+    private fun setupRecyclerView(){
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-
-        val deleteBtn = findViewById<ImageView>(R.id.delete_all_button)
-        loadSummaries()
-
-        deleteBtn.setOnClickListener {
+    }
+    private fun setupListeners(){
+        btnDelete.setOnClickListener {
             lifecycleScope.launch {
                 repository.deleteAll()
                 loadSummaries()
             }
         }
     }
-
+    private fun setupBottomNavigation() {
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav.selectedItemId = R.id.navigation_library
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.navigation_library -> true
+                R.id.navigation_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+    }
     private fun loadSummaries() {
         lifecycleScope.launch {
             val list = repository.getAll()
