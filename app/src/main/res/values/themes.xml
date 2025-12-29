@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MedicalSum" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MedicalSum" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_end</item>
+        <item name="colorOnPrimary">@color/text_light</item>
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/text_light</item>
+
+        <!-- Background & surface -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/primary_end</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Window background -->
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- Ép màu hint thành màu tối (rất quan trọng) -->
+        <item name="android:textColorHint">@color/text_secondary</item>
+    </style>
 </resources>
