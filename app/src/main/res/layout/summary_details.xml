@@ -41,23 +41,32 @@
                 android:id="@+id/summary_title_edit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:textColor="@color/text_light"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_light"
-                android:background="@android:color/transparent"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/edit_title_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:text="Edit"
-                android:textSize="18sp"
                 android:textColor="@color/text_light"
-                android:padding="10dp" />
+                android:textSize="18sp" />
 
+            <ImageView
+                android:id="@+id/btn_save_summary"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_save"
+                app:tint="@color/text_light" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
