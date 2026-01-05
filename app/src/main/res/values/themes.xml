@@ -23,7 +23,7 @@
         <!-- Window background -->
         <item name="android:windowBackground">@color/background</item>
 
-        <!-- Ép màu hint thành màu tối (rất quan trọng) -->
+        <!-- Ép màu hint thành màu tối -->
         <item name="android:textColorHint">@color/text_secondary</item>
     </style>
 </resources>
