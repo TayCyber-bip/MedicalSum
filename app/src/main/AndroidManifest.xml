@@ -36,9 +36,12 @@
             android:name=".SummaryActivity"
             android:theme="@style/Theme.MedicalSum" />
         <activity
+            android:name=".ChatActivity"
+            android:theme="@style/Theme.MedicalSum"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".SummaryDetailsActivity"
             android:theme="@style/Theme.MedicalSum" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

@@ -120,27 +120,11 @@ class SummaryDetailsActivity : ComponentActivity() {
             saveSummaryAsTextFile()
         }
 
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val mode = when (checkedId) {
-                R.id.rb_extract -> "extract"
-                R.id.rb_short -> "short"
-                R.id.rb_tldr -> "tldr"
-                else -> "extract"
-            }
-            // Chỉ gọi API nếu đã có văn bản gốc
-            if (originalText.isNotEmpty()) {
-                resummarizeText(originalText, mode)
-            } else {
-                Toast.makeText(this, "Loading original text...", Toast.LENGTH_SHORT).show()
-            }
-        }
+
         findViewById<Button>(R.id.btn_quiz).setOnClickListener {
             Toast.makeText(this, "Quiz feature in development!", Toast.LENGTH_SHORT).show()
         }
 
-        findViewById<Button>(R.id.btn_chat_ai).setOnClickListener {
-            Toast.makeText(this, "Chat with AI feature in development!", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun enableEditing() {
@@ -203,49 +187,7 @@ class SummaryDetailsActivity : ComponentActivity() {
         }
     }
 
-    private fun resummarizeText(text: String, mode: String) {
-        val url = "http://10.0.2.2:8000/summarize"
-        val json = JSONObject().apply {
-            put("text", text)
-            put("mode", mode)
-        }
 
-        val requestBody = json.toString().toRequestBody("application/json".toMediaType())
-        val request = Request.Builder()
-            .url(url)
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@SummaryDetailsActivity, "Connection error", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string()
-                if (response.isSuccessful && body != null) {
-                    val jsonObj = JSONObject(body)
-                    val newSummary = jsonObj.getString("summary")
-                    runOnUiThread {
-                        tvSummary.text = newSummary
-                        // Cập nhật DB nếu có ID
-                        currentSummary = newSummary
-                        if (summaryId != -1) {
-                            lifecycleScope.launch {
-                                repository.updateSummary(summaryId, newSummary)
-                            }
-                        }
-                    }
-                } else {
-                    runOnUiThread {
-                        Toast.makeText(this@SummaryDetailsActivity, "Server error", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        })
-    }
 
     private fun setupBottomNavigation() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -254,19 +196,21 @@ class SummaryDetailsActivity : ComponentActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                    true
+                }
+
+                R.id.chat_with_ai -> {
+                    startActivity(Intent(this, ChatActivity::class.java))
                     true
                 }
 
                 R.id.navigation_library -> {
                     startActivity(Intent(this, SummaryActivity::class.java))
-                    finish()
                     true
                 }
 
                 R.id.navigation_settings -> {
                     startActivity(Intent(this, SettingsActivity::class.java))
-                    finish()
                     true
                 }
 

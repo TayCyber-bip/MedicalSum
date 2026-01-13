@@ -1,5 +1,6 @@
 package com.example.medicalsum
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
@@ -19,12 +20,14 @@ class SettingsActivity : ComponentActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     startActivity(android.content.Intent(this, MainActivity::class.java))
-                    finish()
                     true
                 }
                 R.id.navigation_library -> {
                     startActivity(android.content.Intent(this, SummaryActivity::class.java))
-                    finish()
+                    true
+                }
+                R.id.chat_with_ai -> {
+                    startActivity(Intent(this, ChatActivity::class.java))
                     true
                 }
                 R.id.navigation_settings -> true

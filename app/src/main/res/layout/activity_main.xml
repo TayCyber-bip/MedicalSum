@@ -84,6 +84,47 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp">
+
+                <RadioGroup
+                    android:id="@+id/radioGroupOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background"
+                    android:paddingHorizontal="15dp">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_extract"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Extract"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_short"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Short"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_tldr"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TL;DR"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_folder"
         android:title="Summaries" />
     <item
+        android:id="@+id/chat_with_ai"
+        android:icon="@drawable/ic_chat_bubble"
+        android:title="Chat" />
+    <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings"
         android:title="Settings" />

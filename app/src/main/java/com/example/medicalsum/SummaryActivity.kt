@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class SummaryActivity : ComponentActivity() {
     private lateinit var repository: SummaryRepository
     private lateinit var btnDelete: ImageView
-    private lateinit var btnHome: ImageView
     private lateinit var recyclerView: RecyclerView
     private val adapter = SummaryAdapter()
 
@@ -31,15 +30,18 @@ class SummaryActivity : ComponentActivity() {
         setupListeners()
         setupBottomNavigation()
     }
+
     private fun initViews() {
         btnDelete = findViewById<ImageView>(R.id.delete_all_button)
         recyclerView = findViewById<RecyclerView>(R.id.rvSummaries)
     }
-    private fun setupRecyclerView(){
+
+    private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
-    private fun setupListeners(){
+
+    private fun setupListeners() {
         btnDelete.setOnClickListener {
             lifecycleScope.launch {
                 repository.deleteAll()
@@ -47,6 +49,7 @@ class SummaryActivity : ComponentActivity() {
             }
         }
     }
+
     private fun setupBottomNavigation() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.navigation_library
@@ -56,15 +59,23 @@ class SummaryActivity : ComponentActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     true
                 }
+
                 R.id.navigation_library -> true
+                R.id.chat_with_ai -> {
+                    startActivity(Intent(this, ChatActivity::class.java))
+                    true
+                }
+
                 R.id.navigation_settings -> {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
+
                 else -> false
             }
         }
     }
+
     private fun loadSummaries() {
         lifecycleScope.launch {
             val list = repository.getAll()

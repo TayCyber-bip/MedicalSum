@@ -38,6 +38,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.activity.viewModels
+import com.example.medicalsum.databinding.ActivityMainBinding
 
 class MainActivity : ComponentActivity() {
     private val client: OkHttpClient by lazy {
@@ -51,6 +53,8 @@ class MainActivity : ComponentActivity() {
             .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: ChatViewModel by viewModels()
     private lateinit var repository: SummaryRepository
     private lateinit var btnApply: MaterialButton
     private lateinit var progressApply: ProgressBar
@@ -88,18 +92,37 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        initViews()
+        initRepository()
+        initActions()
+        setupBottomNavigation()
+    }
+    private fun initViews() {
         btnApply = findViewById(R.id.btn_apply)
         progressApply = findViewById(R.id.progress_apply)
         inputText = findViewById(R.id.input_text)
+    }
+    private fun initRepository() {
         val db = AppDatabase.getDatabase(this)
         repository = SummaryRepository(db.summaryDao())
+    }
+    private fun initActions() {
 
-        findViewById<ImageView>(R.id.icon_camera).setOnClickListener { openCameraWithPermission() }
-        findViewById<ImageView>(R.id.icon_gallery).setOnClickListener { pickImageLauncher.launch("image/*") }
-        findViewById<ImageView>(R.id.icon_file).setOnClickListener { pickFileLauncher.launch("text/plain") }
+        findViewById<ImageView>(R.id.icon_camera)
+            .setOnClickListener { openCameraWithPermission() }
+
+        findViewById<ImageView>(R.id.icon_gallery)
+            .setOnClickListener { pickImageLauncher.launch("image/*") }
+
+        findViewById<ImageView>(R.id.icon_file)
+            .setOnClickListener { pickFileLauncher.launch("text/plain") }
+
         btnApply.setOnClickListener {
             val text = inputText.text.toString().trim()
+
             if (text.isEmpty()) {
                 Toast.makeText(this, "Please enter some text!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -110,8 +133,6 @@ class MainActivity : ComponentActivity() {
             startLoading()
             summarizeText(text)
         }
-
-        setupBottomNavigation()
     }
 
     private fun openCameraWithPermission() {
@@ -188,7 +209,13 @@ class MainActivity : ComponentActivity() {
                     startActivity(Intent(this, SummaryActivity::class.java))
                     true
                 }
-
+                R.id.chat_with_ai -> {
+                    val intent = Intent(this, ChatActivity::class.java).apply {
+                        putExtra("session_id", viewModel.sessionId)
+                    }
+                    startActivity(intent)
+                    true
+                }
                 R.id.navigation_settings -> {
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
@@ -198,53 +225,92 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
+    private fun getSelectedMode(): String {
+        return when (binding.radioGroupOptions.checkedRadioButtonId) {
+            R.id.rb_extract -> "extract"
+            R.id.rb_short -> "short"
+            R.id.rb_tldr -> "tldr"
+            else -> "short"
+        }
+    }
     private fun summarizeText(text: String) {
-        val url = "http://10.0.2.2:8000/summarize"
-        val json = JSONObject()
-        json.put("text", text)
-        val requestBody = json.toString().toRequestBody("application/json".toMediaType())
+        val mode = getSelectedMode()
+
+        val url = "http://10.0.2.2:8000/summarize?mode=$mode"
+
+        val json = JSONObject().apply {
+            put("text", text)
+        }
+
+        val requestBody = json
+            .toString()
+            .toRequestBody("application/json".toMediaType())
+
         val request = Request.Builder()
             .url(url)
             .post(requestBody)
             .addHeader("Content-Type", "application/json")
             .build()
 
+        startLoading()
+
         client.newCall(request).enqueue(object : Callback {
+
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
                 runOnUiThread {
                     stopLoading()
-                    Toast.makeText(this@MainActivity, "Request failed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Request failed!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string()
+
                 runOnUiThread { stopLoading() }
 
                 if (!response.isSuccessful || body == null) {
                     runOnUiThread {
-                        Toast.makeText(this@MainActivity, "Server error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Server error",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                     return
                 }
 
                 val jsonObj = JSONObject(body)
                 val summary = jsonObj.getString("summary")
-                val defaultTitle = "Title"
+
+                val title = when (mode) {
+                    "tldr" -> "TL;DR Summary"
+                    "short" -> "Short Summary"
+                    "extract" -> "Extract Summary"
+                    else -> "Summary"
+                }
 
                 lifecycleScope.launch {
                     repository.insert(
                         SummaryEntity(
-                            title = defaultTitle,
+                            title = title,
                             originalText = text,
                             summaryText = summary
                         )
                     )
-                    val intent = Intent(this@MainActivity, SummaryDetailsActivity::class.java)
-                    intent.putExtra("summary_text", summary)
-                    intent.putExtra("summary_title", defaultTitle)
+
+                    val intent = Intent(
+                        this@MainActivity,
+                        SummaryDetailsActivity::class.java
+                    ).apply {
+                        putExtra("summary_text", summary)
+                        putExtra("summary_title", title)
+                    }
+
                     startActivity(intent)
                 }
             }
